@@ -67,6 +67,12 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("walk: %w", err)
 		}
 
+		// If no entries after filters, do not generate file
+		if tree.IsDir && len(tree.Children) == 0 {
+			fmt.Fprintf(os.Stdout, "No entries found under %s with current filters; no file generated\n", rp)
+			return nil
+		}
+
 		// Render Markdown
 		md := format.RenderMarkdown(rp, cfg, tree, counts)
 
@@ -74,6 +80,9 @@ var rootCmd = &cobra.Command{
 		if err := output.WriteOutput(outputPath, md); err != nil {
 			return fmt.Errorf("write output: %w", err)
 		}
+
+		// Inform result
+		fmt.Fprintf(os.Stdout, "Generated %s (directories: %d, files: %d, symlinks: %d)\n", outputPath, counts.Dirs, counts.Files, counts.Symlinks)
 
 		return nil
 	},

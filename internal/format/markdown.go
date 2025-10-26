@@ -37,6 +37,11 @@ func RenderMarkdown(root string, cfg config.Config, tree *walker.Node, counts wa
 	b.WriteString("```text\n")
 	renderTree(&b, tree, "", true)
 	b.WriteString("```\n\n")
+	if tree.IsDir && len(tree.Children) == 0 {
+		b.WriteString("> No entries found under root with current filters.\n\n")
+	} else if !tree.IsDir {
+		b.WriteString("> Root is a file; no directory entries to list.\n\n")
+	}
 
 	// Counts
 	fmt.Fprintf(&b, "- Directories: %d\n", counts.Dirs)
